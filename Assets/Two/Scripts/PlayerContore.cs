@@ -7,6 +7,7 @@ using System.Timers;
 public class PlayerContore : MonoBehaviour
 {
     private Rigidbody2D rb;
+    private PhysicsCheck physicsCheck;
     private bool facingRight = true;
     
     float moveX;
@@ -16,12 +17,7 @@ public class PlayerContore : MonoBehaviour
     public float moveSpeed = 8f;
     public float jumpForce = 12f;
     public int jumpCount = 1;
-    //地面检测
-    public bool isGround;
-
-    public Transform groundCheck;
-    public LayerMask groundLayer;
-    public float checkRedious = 0.1f;
+ 
 
     //public ParticleSystem jumpEffect; 粒子系统
     //public AudioSource jumpSound; 声音
@@ -30,6 +26,7 @@ public class PlayerContore : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        physicsCheck = GetComponent<PhysicsCheck>();
 
     }
     void Update()
@@ -45,7 +42,7 @@ public class PlayerContore : MonoBehaviour
         }
 
         Movement();
-        isGround = Physics2D.OverlapCircle((Vector2)transform.position, checkRedious, groundLayer);
+        
         Jumping();
 
     }
@@ -64,35 +61,23 @@ public class PlayerContore : MonoBehaviour
 
         moveX = Input.GetAxis("Horizontal");
         moveY = Input.GetAxisRaw("Vertical");
+
         rb.velocity = new Vector2(moveSpeed*moveX, rb.velocity.y);
 
     }
     private void Jumping()
     {
-        
         if (Input.GetKeyDown(KeyCode.Space) && jumpCount < 2)
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
             jumpCount++;
         }
         //检测是否落地
-        
-        if (isGround)
+        if (physicsCheck.isGround)
         {
             jumpCount = 1;
         }
-
         
-    }
-    //检测圈
-    private void OnDrawGizmos()
-    {
-        /*if (groundCheck == null)
-        {
-            return;
-        }*/
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere((Vector2)transform.position, checkRedious);  // 在物体的位置绘制一个半径为1的空心球体
-    }
 
+    }
 }
